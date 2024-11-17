@@ -1,0 +1,14 @@
+create procedure caLculate_areass()
+     begin
+     declare v_radius int;
+     declare v_area float;
+     set v_radius = 5;
+     while v_radius <= 9 do
+     set v_area = 3.14159 * POWER(v_radius, 2);
+     insert into areas(radius,area)
+     values (v_radius, v_area);
+     set v_radius = v_radius + 1;
+     END while;
+     COMMIT;
+     END;
+/
