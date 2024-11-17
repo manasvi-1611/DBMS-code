@@ -1,0 +1,86 @@
+(Perform on MYSQL Terminal)
+Emp(emp_id,ename, street, city)
+works(emp_id,c_id,ename, cname, sal)
+Company(c_id,cname, city)
+Manager(mgr_id, mgrname)
+
+-- Table: Emp
+CREATE TABLE Emp (
+    emp_id INT PRIMARY KEY,
+    ename VARCHAR(50),
+    street VARCHAR(100),
+    city VARCHAR(50)
+);
+
+-- Table: works
+CREATE TABLE works (
+    emp_id INT,
+    c_id INT,
+    ename VARCHAR(50),
+    cname VARCHAR(50),
+    sal DECIMAL(10, 2)
+);
+
+-- Table: Company
+CREATE TABLE Company (
+    c_id INT PRIMARY KEY,
+    cname VARCHAR(50),
+    city VARCHAR(50)
+);
+
+-- Table: Manager
+CREATE TABLE Manager (
+    mgr_id INT PRIMARY KEY,
+    mgrname VARCHAR(50)
+);
+
+-- Sample Data
+INSERT INTO Company (c_id, cname, city) VALUES
+(1, 'ABC', 'Mumbai'),
+(2, 'Mbank', 'Delhi'),
+(3, 'Bosch', 'Pune'),
+(4, 'SBC', 'Mumbai');
+
+INSERT INTO Emp (emp_id, ename, street, city) VALUES
+(1, 'John', '123 Elm St', 'Mumbai'),
+(2, 'Alice', '456 Maple Ave', 'Delhi'),
+(3, 'Bob', '789 Oak Rd', 'Pune');
+
+INSERT INTO works (emp_id, c_id, ename, cname, sal) VALUES
+(1, 1, 'John', 'ABC', 30000),
+(2, 2, 'Alice', 'Mbank', 18000),
+(3, 3, 'Bob', 'Bosch', 55000),
+(4, 4, 'Charlie', 'SBC', 60000);
+
+INSERT INTO Manager (mgr_id, mgrname) VALUES
+(1, 'Mr. Smith'),
+(2, 'Ms. Johnson');
+
+
+i. Modify the database so that a particular company (eg. ABC) now in Pune
+
+UPDATE Company
+SET city = 'Pune'
+WHERE cname = 'ABC';
+
+ii. Give all managers of Mbank a 10% raise. If salary is >20,000, give only 3% raise.
+
+UPDATE works
+SET sal = CASE 
+            WHEN sal > 20000 THEN sal * 1.03
+            ELSE sal * 1.10
+          END
+WHERE cname = 'Mbank';
+
+iii. Find out the names of all the employees who works in „Bosch‟ company in city Pune
+
+SELECT ename
+FROM works w
+JOIN Company c ON w.c_id = c.c_id
+WHERE c.cname = 'Bosch' AND c.city = 'Pune';
+
+iv. Delete all records in the works table for employees of a particular company (Eg,
+SBC Company) whose salary>50,000.
+
+DELETE FROM works
+WHERE cname = 'SBC' AND sal > 50000;
