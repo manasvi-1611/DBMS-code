@@ -1,0 +1,106 @@
+
+create table borrow(
+roll_no number primary key(),
+name varchar2(50),
+date_of_issue date,
+name_of_book varchar2(50),
+status char(1));
+
+
+create table fine(
+roll_no number,
+amt number,
+sys_date date);
+
+
+insert into borrower(roll_no , name , date_of_issue , name_of_book, status)
+values(8, 'ria' , to_date('01-sep-2024', 'DD-MON-YYYY'), 'DBMS', 'I');
+insert into borrower(roll_no, name, date_of_issue, name_of_book, status)
+values(2,'ayesha', to_date('22-AUG-2024' , 'dd-mon-yyyy'),'history' , 'i');
+
+select *  from borrower;
+select * from fine;
+
+SET SERVEROUTPUT ON;
+
+DECLARE
+    v_roll_no      NUMBER := &roll_no;
+    v_book_name    VARCHAR2(50) := '&book_name';
+
+    v_date_of_issue DATE;
+    v_current_date  DATE;
+    v_no_of_days   NUMBER;
+    v_fine         NUMBER := 0;
+    v_max_fine     NUMBER := 250;
+    v_status       CHAR(1);
+
+    e_no_data_found EXCEPTION;
+
+BEGIN
+    SELECT SYSDATE INTO v_current_date FROM dual;
+
+    BEGIN
+        SELECT date_of_issue, status
+        INTO v_date_of_issue, v_status
+        FROM borrower
+        WHERE roll_no = v_roll_no AND name_of_book = v_book_name;
+
+        IF v_status = 'R' THEN
+            dbms_output.put_line('Book already returned');
+            RETURN;
+        END IF;
+
+    EXCEPTION
+        WHEN no_data_found THEN
+            RAISE e_no_data_found;
+    END;
+
+    v_no_of_days := v_current_date - v_date_of_issue;
+
+    IF v_no_of_days > 15 AND v_no_of_days <= 30 THEN
+        v_fine := v_no_of_days * 5;
+    ELSIF v_no_of_days > 30 THEN
+        v_fine := (v_no_of_days - 30) * 50 + (15 * 5);
+    END IF;
+
+    IF v_fine > v_max_fine THEN
+        v_fine := v_max_fine;
+    END IF;
+
+    IF v_fine > 0 THEN
+        INSERT INTO fine(roll_no, amt, sys_date)
+        VALUES(v_roll_no, v_fine, v_current_date);
+        dbms_output.put_line('Fine of Rs. ' || v_fine || ' applied for Roll No: ' || v_roll_no);
+    ELSE
+        dbms_output.put_line('No fine');
+    END IF;
+
+    UPDATE borrower
+    SET status = 'R'
+    WHERE roll_no = v_roll_no AND name_of_book = v_book_name;
+    
+    dbms_output.put_line('Book returned');
+
+EXCEPTION
+    WHEN e_no_data_found THEN
+        dbms_output.put_line('No data found for Roll No: ' || v_roll_no || ' and Book: ' || v_book_name);
+    WHEN others THEN
+        dbms_output.put_line('An unexpected error occurred: ' || SQLERRM);
+END;
+/
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
