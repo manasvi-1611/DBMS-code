@@ -1,0 +1,82 @@
+
+
+CREATE TABLE stud_marks (
+        rollno NUMBER PRIMARY KEY,
+        name VARCHAR2(25),
+        total_marks NUMBER
+    );
+
+
+ CREATE TABLE result (
+        roll_number NUMBER PRIMARY KEY,
+        name VARCHAR2(25),
+        class VARCHAR2(30)
+    );
+
+
+ -- Step 2: Create the procedure for inserting results based on marks
+ CREATE OR REPLACE PROCEDURE procedure_1 (
+        roll_no IN NUMBER,
+        name IN VARCHAR2,
+        marks IN NUMBER
+    ) AS
+    BEGIN
+       IF (marks <= 1500 AND marks >= 990) THEN
+            DBMS_OUTPUT.PUT_LINE('DISTINCTION');
+            INSERT INTO result VALUES (roll_no, name, 'DISTINCTION');
+       ELSIF (marks <= 989 AND marks >= 900) THEN
+           DBMS_OUTPUT.PUT_LINE('FIRST CLASS');
+           INSERT INTO result VALUES (roll_no, name, 'FIRST CLASS');
+       ELSIF (marks <= 899 AND marks > 825) THEN
+           DBMS_OUTPUT.PUT_LINE('HIGHER SECOND CLASS');
+           INSERT INTO result VALUES (roll_no, name, 'HIGHER SECOND CLASS');
+       ELSE
+           DBMS_OUTPUT.PUT_LINE('FAIL');
+           INSERT INTO result VALUES (roll_no, name, 'FAIL');
+       END IF;
+       INSERT INTO stud_marks VALUES (roll_no, name, marks);
+   END procedure_1;
+   /
+-- Step 3: Create the function that calls the procedure
+ CREATE OR REPLACE FUNCTION func_1 (
+        r IN NUMBER,
+        n IN VARCHAR2,
+        m IN NUMBER
+    ) RETURN VARCHAR2 AS
+    BEGIN
+        procedure_1(r, n, m);
+        RETURN 'SUCCESSFUL';
+    END;
+  /
+ -- Step 4: Allow user input and insert data
+ SET SERVEROUTPUT ON;
+
+ DECLARE
+        roll_no NUMBER;
+        name VARCHAR2(25);
+        marks NUMBER;
+        result_status VARCHAR2(25);
+    BEGIN
+        -- User input for roll number, name, and marks
+        roll_no := &roll_no;  -- Prompt for roll number
+        name := '&name';       -- Prompt for name
+       marks := &marks;       -- Prompt for marks
+ 
+       -- Call function to insert data
+      result_status := func_1(roll_no, name, marks);
+ 
+       -- Output the result of the insertion
+       DBMS_OUTPUT.PUT_LINE('Result insertion for ' || name || ': ' || result_status);
+   END;
+   /
+--Enter value for roll_no: 101
+--old   8:     roll_no := &roll_no;  -- Prompt for roll number
+new   8:     roll_no := 101;  -- Prompt for roll number
+Enter value for name: john doe
+old   9:     name := '&name';       -- Prompt for name
+new   9:     name := 'john doe';       -- Prompt for name
+Enter value for marks: 950
+old  10:     marks := &marks;       -- Prompt for marks
+new  10:     marks := 950;       -- Prompt for marks
+FIRST CLASS
+Result insertion for john doe: SUCCESSFUL
